@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Not to Become an Insider Threat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.7;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #f8fafc 0%, #ecf0f1 25%, #e8f1f8 50%, #f0e8f8 75%, #f8fafc 100%);
+            min-height: 100vh;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1a2744 50%, #0f172a 100%);
+            color: white;
+            padding: 6rem 2rem;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.5);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 3px solid #3b82f6;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 5%;
+            transform: translateY(-50%);
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(50px);
+        }
+        
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 10%;
+            left: 10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(50px);
+        }
+        
+        header h1 {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -2px;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        header h1 .emphasis {
+            font-size: 4.8rem;
+            font-weight: 950;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff4444 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 20px rgba(255, 68, 68, 0.3);
+        }
+        
+        header h1::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+            border-radius: 2px;
+        }
+        
+        header h1::after {
+            content: '🔒';
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
+            opacity: 0.8;
+        }
+        
+        header p {
+            font-size: 1.4rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 2;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-top: 2rem;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        header p:last-of-type {
+            font-size: 0.95rem !important;
+            color: #10b981 !important;
+            opacity: 0.95;
+            font-weight: 500;
+            -webkit-text-fill-color: unset;
+            background: none !important;
+        }
+        
+        nav {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 1.2rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(30, 58, 138, 0.15);
+            backdrop-filter: blur(10px);
+        }
+        
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: center;
+        }
+        
+        nav a {
+            color: #1e3a8a;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.82rem;
+            transition: all 0.3s ease;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, #1e40af);
+            transition: width 0.3s ease;
+        }
+        
+        nav a:hover {
+            color: #3b82f6;
+        }
+        
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        html {
+            scroll-padding-top: 50px;
+        }
+        
+        container {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 1rem;
+        }
+        
+        section {
+            background: white;
+            margin-bottom: 2.5rem;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 2px solid rgba(59, 130, 246, 0.1);
+            position: relative;
+            border-left: 6px solid #3b82f6;
+            scroll-margin-top: 50px;
+        }
+
+        .ai-chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 340px;
+            z-index: 300;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .ai-chat-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.95rem 1rem;
+            margin-top: 0.75rem;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 999px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 12px 30px rgba(37, 99, 235, 0.25);
+            transition: transform 0.2s ease;
+        }
+
+        .ai-chat-toggle:hover {
+            transform: translateY(-2px);
+        }
+
+        .ai-chat-panel {
+            margin-top: 0.75rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+            overflow: hidden;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            display: none;
+        }
+
+        .ai-chat-panel.open {
+            display: block;
+        }
+
+        .ai-chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1rem 0.75rem;
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+        }
+
+        .ai-chat-header span {
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .ai-chat-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.25rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .ai-chat-body {
+            max-height: 320px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f8fafc;
+        }
+
+        .ai-message {
+            margin-bottom: 0.9rem;
+            padding: 0.9rem 1rem;
+            border-radius: 16px;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            word-break: break-word;
+        }
+
+        .ai-message-bot {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            color: #1e3a8a;
+        }
+
+        .ai-message-user {
+            background: #1e3a8a;
+            color: white;
+            text-align: right;
+        }
+
+        .ai-chat-input-area {
+            display: flex;
+            gap: 0.6rem;
+            padding: 0.95rem;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+        }
+
+        .ai-chat-input {
+            flex: 1;
+            padding: 0.85rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 999px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .ai-chat-send {
+            flex-shrink: 0;
+            padding: 0.8rem 1rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            border: none;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .ai-chat-send:hover {
+            opacity: 0.94;
+        }
+
+        .ai-chat-hint {
+            font-size: 0.85rem;
+            color: #475569;
+            margin-top: 0.25rem;
+            padding: 0 1rem 1rem;
+        }
+
+        section:nth-child(2) {
+            border-left-color: #a855f7;
+        }
+        
+        section:nth-child(3) {
+            border-left-color: #06b6d4;
+        }
+        
+        section:nth-child(4) {
+            border-left-color: #10b981;
+        }
+        
+        section:nth-child(5) {
+            border-left-color: #f59e0b;
+        }
+        
+        section:hover {
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+        
+        section h2 {
+            color: #1e3a8a;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+        
+        section:nth-child(2) h2 {
+            background: linear-gradient(135deg, #6b21a8 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        section:nth-child(3) h2 {
+            background: linear-gradient(135deg, #0e7490 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        section:nth-child(4) h2 {
+            background: linear-gradient(135deg, #065f46 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        section:nth-child(5) h2 {
+            background: linear-gradient(135deg, #b45309 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        section h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #1e40af);
+            border-radius: 2px;
+        }
+        
+        section:nth-child(2) h2::after {
+            background: linear-gradient(90deg, #a855f7, #6b21a8);
+        }
+        
+        section:nth-child(3) h2::after {
+            background: linear-gradient(90deg, #06b6d4, #0e7490);
+        }
+        
+        section:nth-child(4) h2::after {
+            background: linear-gradient(90deg, #10b981, #065f46);
+        }
+        
+        section:nth-child(5) h2::after {
+            background: linear-gradient(90deg, #f59e0b, #b45309);
+        }
+        
+        section h3 {
+            color: #1e40af;
+            font-size: 1.8rem;
+            margin-top: 2rem;
+            margin-bottom: 1.2rem;
+            font-weight: 600;
+        }
+        
+        section p {
+            color: #555;
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+        
+        .tip-box {
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+            border-left: 5px solid #3b82f6;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
+        }
+        
+        .tip-box strong {
+            color: #1e40af;
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fefce8 100%);
+            border-left: 5px solid #f59e0b;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.1);
+        }
+        
+        .warning-box strong {
+            color: #b45309;
+        }
+        
+        .good-practice {
+            background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);
+            border-left: 5px solid #10b981;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1);
+        }
+        
+        .good-practice strong {
+            color: #065f46;
+        }
+        
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        li {
+            margin-bottom: 0.8rem;
+            color: #444;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #1e40af);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:nth-child(2)::before {
+            background: linear-gradient(90deg, #a855f7, #7c3aed);
+        }
+        
+        .card:nth-child(3)::before {
+            background: linear-gradient(90deg, #06b6d4, #0891b2);
+        }
+        
+        .card:nth-child(4)::before {
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+        
+        .card:nth-child(5)::before {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+        }
+        
+        .card:nth-child(6)::before {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+        }
+        
+        .card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+            transform: translateY(-5px);
+        }
+        
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .card h4 {
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .card:nth-child(2) h4 {
+            color: #6b21a8;
+        }
+        
+        .card:nth-child(3) h4 {
+            color: #0e7490;
+        }
+        
+        .card:nth-child(4) h4 {
+            color: #065f46;
+        }
+        
+        .card:nth-child(5) h4 {
+            color: #b45309;
+        }
+        
+        .card:nth-child(6) h4 {
+            color: #b91c1c;
+        }
+        
+        .card p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .quiz-form {
+            margin-top: 1.5rem;
+        }
+
+        .quiz-stats {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #eef2ff 0%, #eff6ff 100%);
+            border: 1px solid #c7d2fe;
+            border-radius: 14px;
+            color: #1e3a8a;
+        }
+
+        .quiz-stats p {
+            margin: 0.6rem 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .chart-card {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+        }
+
+        .chart-card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.15rem;
+            color: #1e40af;
+        }
+
+        .chart-canvas {
+            width: 100%;
+            max-width: 720px;
+            height: 280px;
+            display: block;
+        }
+
+        .quiz-question {
+            margin-bottom: 1.8rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #edf2ff 100%);
+            border-radius: 12px;
+            border: 1px solid #dbeafe;
+        }
+
+        .quiz-question p {
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+
+        .quiz-options {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .quiz-options li {
+            margin-bottom: 0.8rem;
+        }
+
+        .quiz-options label {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            color: #334155;
+        }
+
+        .quiz-options input {
+            accent-color: #3b82f6;
+        }
+
+        .quiz-button {
+            display: inline-block;
+            padding: 0.95rem 1.8rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            border: none;
+            border-radius: 999px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            margin-top: 0.5rem;
+        }
+
+        .quiz-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .quiz-result {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 1px solid #10b981;
+            color: #065f46;
+            font-weight: 600;
+        }
+
+        .quiz-result span {
+            display: block;
+            margin-top: 0.5rem;
+            font-weight: 500;
+            color: #134e4a;
+        }
+        
+        footer {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+            box-shadow: 0 -4px 20px rgba(30, 58, 138, 0.2);
+        }
+        
+        footer p {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #fbbf24 0%, #f59e0b 100%);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #78350f;
+        }
+        
+        .video-container {
+            margin: 2rem 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background-color: #000;
+        }
+        
+        .video-container iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+            border-radius: 12px;
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            header p {
+                font-size: 1rem;
+            }
+            
+            nav ul {
+                gap: 1rem;
+            }
+            
+            nav a {
+                font-size: 0.85rem;
+            }
+            
+            section {
+                padding: 2rem 1.5rem;
+            }
+            
+            section h2 {
+                font-size: 2rem;
+            }
+            
+            section h3 {
+                font-size: 1.4rem;
+            }
+        }
+
+        /* Language picker in nav */
+        .nav-lang-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-left: auto;
+        }
+
+        .nav-lang-icon {
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        #google_translate_element .goog-te-gadget-simple {
+            border: 1.5px solid #3b82f6 !important;
+            border-radius: 8px !important;
+            padding: 2px 6px !important;
+            background: white !important;
+            font-size: 0.85rem !important;
+        }
+
+        #google_translate_element .goog-te-gadget-simple .goog-te-menu-value span {
+            color: #1e3a8a !important;
+            font-weight: 600 !important;
+            font-family: 'Inter', sans-serif !important;
+        }
+
+        #google_translate_element .goog-te-gadget-simple .goog-te-menu-value span:last-child {
+            color: #3b82f6 !important;
+        }
+
+        .goog-te-banner-frame.skiptranslate { display: none !important; }
+        iframe.goog-te-banner-frame { display: none !important; }
+        body { top: 0 !important; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>How <span class="emphasis">NOT</span> to Become an Insider Threat</h1>
+        <p>Prevent Data Breaches, Protect Your Career, and Safeguard Your Organization</p>
+        <p style="font-size: 0.95rem; opacity: 0.85; margin-top: 1rem;">Understand the risks, recognize warning signs, and ensure you're never a threat to your workplace</p>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="#definition">What is an Insider Threat?</a></li>
+            <li><a href="#types">Types of Threats</a></li>
+            <li><a href="#prevention">Prevention Strategies</a></li>
+            <li><a href="#best-practices">Best Practices</a></li>
+            <li><a href="#case-study">Case Study</a></li>
+            <li><a href="#quiz">Quiz</a></li>
+            <li><a href="#resources">Resources</a></li>
+            <li class="nav-lang-item">
+                <span class="nav-lang-icon">🌐</span>
+                <div id="google_translate_element"></div>
+            </li>
+        </ul>
+    </nav>
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'ar,zh-CN,zh-TW,fr,de,hi,it,ja,ko,pt,ru,es,tr,uk,vi',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <container>
+        <!-- Definition Section -->
+        <section id="definition">
+            <h2>What is an Insider Threat?</h2>
+            <p>An insider threat is a security risk posed by individuals who have legitimate access to an organization's systems, data, and facilities. This includes employees, contractors, and partners who may intentionally or unintentionally compromise security.</p>
+            
+            <div class="tip-box">
+                <strong>Key Point:</strong> Insider threats can cause significant damage including data breaches, financial loss, intellectual property theft, and reputational harm.
+            </div>
+            
+            <h3>Why Should You Care?</h3>
+            <ul>
+                <li>Protect your organization's sensitive information</li>
+                <li>Maintain your professional reputation</li>
+                <li>Avoid legal consequences and criminal charges</li>
+                <li>Ensure business continuity and security</li>
+                <li>Protect your colleagues and customers</li>
+            </ul>
+        </section>
+        
+        <!-- Types of Threats Section -->
+        <section id="types">
+            <h2>Types of Insider Threats</h2>
+            
+            <h3>1. Malicious Insiders</h3>
+            <p>Individuals who intentionally steal data or cause harm to the organization for personal gain, revenge, or other motives.</p>
+            <ul>
+                <li>Selling confidential information to competitors</li>
+                <li>Stealing intellectual property</li>
+                <li>Sabotaging systems or data</li>
+                <li>Unauthorized disclosure of sensitive information</li>
+            </ul>
+            
+            <h3>2. Negligent Employees</h3>
+            <p>Well-intentioned employees who unintentionally expose sensitive information due to carelessness or lack of security awareness.</p>
+            <ul>
+                <li>Falling victim to phishing attacks</li>
+                <li>Sharing passwords or sensitive credentials</li>
+                <li>Using weak passwords</li>
+                <li>Accessing systems on unsecured networks</li>
+                <li>Improper handling of physical documents</li>
+            </ul>
+            
+            <h3>3. Compromised Insiders</h3>
+            <p>Employees whose accounts or devices have been compromised by external attackers.</p>
+            <ul>
+                <li>Infected devices with malware</li>
+                <li>Compromised credentials used by third parties</li>
+                <li>Unauthorized access through social engineering</li>
+            </ul>
+            
+            <h3>4. Disgruntled Employees</h3>
+            <p>Employees experiencing job dissatisfaction who may pose risks during transition periods.</p>
+            <ul>
+                <li>Feeling undervalued or unfairly treated</li>
+                <li>During notice periods or termination</li>
+                <li>After denied promotions or salary increases</li>
+            </ul>
+        </section>
+        
+        <!-- Prevention Strategies Section -->
+        <section id="prevention">
+            <h2>Prevention Strategies</h2>
+            
+            <h3>Personal Security Hygiene</h3>
+            <div class="good-practice">
+                <strong>✓ DO:</strong>
+                <ul>
+                    <li>Use <span class="highlight">strong, unique passwords</span> (12+ characters with mixed case, numbers, symbols)</li>
+                    <li>Enable <span class="highlight">multi-factor authentication (MFA)</span> on all accounts</li>
+                    <li>Keep your devices and software <span class="highlight">updated and patched</span></li>
+                    <li>Install and maintain antivirus and anti-malware software</li>
+                    <li>Lock your devices when away, even for short periods</li>
+                    <li>Use VPN on public Wi-Fi networks</li>
+                </ul>
+            </div>
+            
+            <div class="warning-box">
+                <strong>✗ DON'T:</strong>
+                <ul>
+                    <li>Share your passwords with colleagues or write them down</li>
+                    <li>Use the same password across multiple accounts</li>
+                    <li>Access sensitive data on personal devices or public networks</li>
+                    <li>Leave your workstation unlocked and unattended</li>
+                    <li>Click suspicious links or download attachments from unknown sources</li>
+                    <li>Respond to phishing emails or social engineering attempts</li>
+                </ul>
+            </div>
+            
+            <h3>Data Handling Best Practices</h3>
+            <ul>
+                <li><strong>Classify Information:</strong> Understand data sensitivity levels (public, internal, confidential, restricted)</li>
+                <li><strong>Access Control:</strong> Only access data necessary for your role</li>
+                <li><strong>Secure Storage:</strong> Store sensitive data in encrypted, approved locations</li>
+                <li><strong>Proper Disposal:</strong> Securely delete or shred confidential documents</li>
+                <li><strong>Encryption:</strong> Use encryption for sensitive files and communications</li>
+                <li><strong>Audit Trails:</strong> Understand that data access is monitored and logged</li>
+            </ul>
+            
+            <h3>Communication Security</h3>
+            <ul>
+                <li><strong>Email Safety:</strong> Be cautious with attachments and links; verify sender identities</li>
+                <li><strong>Confidential Discussions:</strong> Don't discuss sensitive matters in public areas or over insecure channels</li>
+                <li><strong>Social Media:</strong> Avoid oversharing company information on social platforms</li>
+                <li><strong>Third Parties:</strong> Never share company credentials with external parties</li>
+                <li><strong>Approved Tools:</strong> Use only authorized communication platforms for business</li>
+            </ul>
+            
+            <h3>Workplace Conduct</h3>
+            <ul>
+                <li><strong>Compliance:</strong> Follow all security policies and procedures strictly</li>
+                <li><strong>Reporting:</strong> Report suspicious activities or security incidents immediately</li>
+                <li><strong>Transparency:</strong> Disclose conflicts of interest and external relationships</li>
+                <li><strong>Professional Conduct:</strong> Maintain ethical standards in all business activities</li>
+                <li><strong>Training:</strong> Participate in security awareness and compliance training</li>
+            </ul>
+        </section>
+        
+        <!-- Best Practices Section -->
+        <section id="best-practices">
+            <h2>Best Practices for Secure Behavior</h2>
+            
+            <div class="grid">
+                <div class="card">
+                    <h4>🔐 Stay Vigilant</h4>
+                    <p>Be aware of security threats and suspicious activities. Think before you act with sensitive information.</p>
+                </div>
+                
+                <div class="card">
+                    <h4>📚 Continuous Learning</h4>
+                    <p>Regularly update your security knowledge. Participate in training programs and stay informed about new threats.</p>
+                </div>
+                
+                <div class="card">
+                    <h4>🤝 Follow the Rules</h4>
+                    <p>Adhere strictly to your organization's security policies, procedures, and code of conduct.</p>
+                </div>
+                
+                <div class="card">
+                    <h4>🚨 Report Issues</h4>
+                    <p>If you notice suspicious behavior or security incidents, report them to your security team immediately.</p>
+                </div>
+                
+                <div class="card">
+                    <h4>💼 Professional Ethics</h4>
+                    <p>Maintain high ethical standards. Don't engage in activities that could harm your organization.</p>
+                </div>
+                
+                <div class="card">
+                    <h4>🔄 Access Reviews</h4>
+                    <p>Validate that your system access is appropriate for your current role and remove unnecessary privileges.</p>
+                </div>
+            </div>
+            
+            <h3>Red Flags to Avoid</h3>
+            <div class="warning-box">
+                <strong>Actions that can mark you as a potential threat:</strong>
+                <ul>
+                    <li>Accessing data outside your job responsibilities</li>
+                    <li>Making unauthorized copies of sensitive files</li>
+                    <li>Attempting to bypass security controls</li>
+                    <li>Communicating with competitors or external parties about confidential matters</li>
+                    <li>Working unusual hours with unusual data access patterns</li>
+                    <li>Downloading large amounts of data before leaving the organization</li>
+                    <li>Sharing login credentials or authentication tokens</li>
+                    <li>Installing unauthorized software or hardware</li>
+                    <li>Attempting to cover up security incidents</li>
+                </ul>
+            </div>
+        </section>
+        
+        <!-- Resources Section -->
+        <section id="resources">
+            <h2>Additional Resources</h2>
+            
+            <h3>Important Contacts</h3>
+            <ul>
+                <li><strong>Security Team:</strong> Report threats and incidents immediately</li>
+                <li><strong>IT Support:</strong> Assistance with security tools and device issues</li>
+                <li><strong>Compliance Officer:</strong> Questions about policies and procedures</li>
+                <li><strong>HR Department:</strong> Workplace concerns and conflicts</li>
+            </ul>
+            
+            <h3>Recommended Training</h3>
+            <ul>
+                <li>Annual Security Awareness training</li>
+                <li>Data Protection and Privacy training</li>
+                <li>Acceptable Use Policy training</li>
+                <li>Phishing and Social Engineering awareness</li>
+                <li>Incident Reporting procedures</li>
+            </ul>
+            
+            <h3>Key Takeaways</h3>
+            <div class="good-practice">
+                <ul>
+                    <li>Understand what constitutes an insider threat</li>
+                    <li>Implement strong personal security practices</li>
+                    <li>Handle sensitive data responsibly</li>
+                    <li>Follow your organization's security policies</li>
+                    <li>Report suspicious activities immediately</li>
+                    <li>Maintain professional and ethical conduct</li>
+                    <li>Stay informed about security best practices</li>
+                </ul>
+            </div>
+        </section>
+        
+        <!-- Case Study Section -->
+        <section id="case-study">
+            <h2>Case Study Scenario: The Technical Insider Threat</h2>
+            
+            <h3>Scenario Overview</h3>
+            <p>Jerry, a technically skilled employee with strong IT and coding expertise, reaches out to Tom (a colleague with limited IT knowledge) about starting a side business "sniping" goods on eBay and Amazon. Jerry will handle the technical infrastructure—including sniping software (Gixen or Auction Sniper), cryptocurrency management, and system automation. Tom, confident with social media and customer interaction, will manage customer sales and communications. Both will run the sniping operation, with plans to scale by hiring additional participants if successful.</p>
+            
+            <h3>Why Jerry is the Primary Insider Threat</h3>
+            
+            <div class="warning-box">
+                <strong>⚠️ Critical Insider Threat Characteristics:</strong>
+                <ul>
+                    <li><strong>Technical Expertise:</strong> Jerry's superior IT and coding skills give him the ability to exploit company systems, evade detection, and implement complex fraud infrastructure</li>
+                    <li><strong>System Access:</strong> As an IT-skilled employee, Jerry likely has elevated privileges and deep knowledge of company network architecture</li>
+                    <li><strong>Recruitment & Manipulation:</strong> Jerry is actively recruiting Tom (a less technical colleague) into the scheme, suggesting a pattern of identifying vulnerable targets</li>
+                    <li><strong>Cryptocurrency Preference:</strong> Jerry's enthusiasm for Solana (over Bitcoin) indicates deeper blockchain knowledge and ability to use more sophisticated financial obfuscation</li>
+                    <li><strong>Technical Implementation:</strong> Jerry will design and deploy the sniping software, automation scripts, and payment systems—the core technical infrastructure of the fraud</li>
+                    <li><strong>Premeditation:</strong> This is not an opportunistic act; Jerry deliberately planned the scheme and approached Tom as a collaborator</li>
+                    <li><strong>Untrusted External Origin:</strong> Tom met Jerry online, indicating Jerry recruited someone outside normal organizational networks</li>
+                    <li><strong>Scalability Planning:</strong> Plans to "hire on more people" suggest Jerry intends to build an organized fraud operation within or leveraging the company</li>
+                </ul>
+            </div>
+            
+            <h3>How Jerry Exploits His Position</h3>
+            <div class="tip-box">
+                <strong>Technical Exploitation Methods:</strong>
+                <ul>
+                    <li><strong>Company System Usage:</strong> Use company servers, bandwidth, and computational resources to run sniping software</li>
+                    <li><strong>Network Anonymization:</strong> Route cryptocurrency transactions and communications through company VPN/proxy to hide true origin</li>
+                    <li><strong>Credential Abuse:</strong> Leverage his IT access to create hidden accounts, backdoors, or escalated privileges</li>
+                    <li><strong>Log Tampering:</strong> Delete or modify system logs to cover tracks of suspicious activity</li>
+                    <li><strong>Malware & Automation:</strong> Deploy custom scripts or tools to automate the sniping process without leaving obvious evidence</li>
+                    <li><strong>Data Exfiltration:</strong> Potentially access customer financial information or company proprietary data to support the scheme</li>
+                    <li><strong>Recruitment Infrastructure:</strong> Use technical skills to build secure communication channels and payment systems for additional participants</li>
+                </ul>
+            </div>
+            
+            <h3>Role Delegation & Operational Security</h3>
+            <div class="good-practice">
+                <strong>Division of Responsibilities:</strong>
+                <ul>
+                    <li><strong>Jerry (Technical Role):</strong> Develops fraud infrastructure, manages technical systems, handles cryptocurrency transactions, creates automation software</li>
+                    <li><strong>Tom (Non-Technical Role):</strong> Customer-facing operations, social media presence, sales communications—deliberately kept isolated from technical details</li>
+                    <li><strong>Separation of Knowledge:</strong> This division limits what Tom knows about the underlying technical fraud, reducing his ability to fully understand or expose the scope</li>
+                    <li><strong>Scalability Model:</strong> Jerry's role makes him the organizer; hiring more people would expand his control network exponentially</li>
+                </ul>
+            </div>
+            
+            <h3>Jerry's Insider Threat Profile</h3>
+            <div class="warning-box">
+                <strong>⚠️ Insider Threat Indicators Present:</strong>
+                <ul>
+                    <li>✓ <strong>High Skill Level:</strong> Technical expertise far exceeds what's necessary for legitimate work</li>
+                    <li>✓ <strong>System Access Abuse:</strong> Will directly misuse company IT infrastructure for personal fraud</li>
+                    <li>✓ <strong>Intentional Misconduct:</strong> Deliberate planning and execution of fraud scheme</li>
+                    <li>✓ <strong>Financial Motivation:</strong> Cryptocurrency profits are the primary driver</li>
+                    <li>✓ <strong>Recruitment & Expansion:</strong> Building a network of co-conspirators; planning to scale operations</li>
+                    <li>✓ <strong>Sophistication:</strong> Technical knowledge allows evasion of standard detection methods</li>
+                    <li>✓ <strong>Trust Betrayal:</strong> Abusing employer trust and system access for personal enrichment</li>
+                </ul>
+            </div>
+            
+            <h3>Potential Consequences for Jerry</h3>
+            <div class="warning-box">
+                <strong>Severe Legal & Professional Consequences:</strong>
+                <ul>
+                    <li><strong>Criminal Charges:</strong> Wire fraud, computer fraud and abuse, unauthorized system access, money laundering, conspiracy</li>
+                    <li><strong>Federal Felonies:</strong> Under 18 U.S.C. § 1030 (Computer Fraud and Abuse Act), Jerry's unauthorized system access is a federal crime</li>
+                    <li><strong>Enhanced Penalties:</strong> Multi-count indictment carries significantly longer prison sentences (potentially 10+ years)</li>
+                    <li><strong>Civil Liability:</strong> Lawsuits from eBay, Amazon, affected customers, and the employer</li>
+                    <li><strong>Employment Termination & Blacklisting:</strong> Immediate dismissal with notation of fraud and criminal conduct</li>
+                    <li><strong>Financial Penalties:</strong> Substantial fines, restitution, asset seizure (including cryptocurrency held in accounts)</li>
+                    <li><strong>Organization Impact:</strong> Significant reputational damage, regulatory investigation, potential compliance violations</li>
+                    <li><strong>Career Destruction:</strong> Criminal record destroys future employment prospects in IT and finance sectors</li>
+                </ul>
+            </div>
+            
+            <h3>Detection & Prevention Strategies</h3>
+            <div class="good-practice">
+                <strong>✓ Specifically Targeting Insider Threats Like Jerry:</strong>
+                <ul>
+                    <li><strong>Privileged Access Monitoring (PAM):</strong> Track and audit all elevated system access, especially outside business hours</li>
+                    <li><strong>Behavioral Analytics:</strong> Monitor for unusual network patterns—data exfiltration, cryptocurrency-related traffic, unknown external IPs</li>
+                    <li><strong>Code & Script Review:</strong> Audit custom automation scripts for unauthorized functionality or hidden operations</li>
+                    <li><strong>Financial Transaction Monitoring:</strong> Flag cryptocurrency deposits/withdrawals, unusual wire transfers, or external business account establishment</li>
+                    <li><strong>System Log Auditing:</strong> Detect log modification or deletion attempts—a key sign of cover-up activity</li>
+                    <li><strong>Network Traffic Analysis:</strong> Monitor for unauthorized outbound connections, VPN usage patterns, or port scanning</li>
+                    <li><strong>Recruitment Awareness:</strong> Train staff to report colleagues attempting to recruit them for outside schemes</li>
+                    <li><strong>Principle of Least Privilege:</strong> Restrict Jerry's system access to only what's necessary for legitimate job functions</li>
+                    <li><strong>Regular Access Reviews:</strong> Quarterly audits of who has what privileges and whether it aligns with current role</li>
+                </ul>
+            </div>
+            
+            <h3>Why This is a High-Risk Scenario</h3>
+            <p>Jerry represents the most dangerous type of insider threat because:</p>
+            <ul>
+                <li><strong>Technical Sophistication:</strong> Can implement fraud that standard monitoring might miss</li>
+                <li><strong>System Knowledge:</strong> Understands company defenses and how to circumvent them</li>
+                <li><strong>Recruitment Capability:</strong> Can identify and recruit other insiders, multiplying the threat</li>
+                <li><strong>Premeditation:</strong> This is planned fraud, not impulsive misconduct</li>
+                <li><strong>Scalability:</strong> Infrastructure designed to grow, increasing damage potential</li>
+                <li><strong>Authority Advantage:</strong> His IT role makes it harder for non-technical staff to question his activities</li>
+            </ul>
+            
+            <h3>Key Takeaways</h3>
+            <div class="good-practice">
+                <strong>Lessons for Organizations:</strong>
+                <ul>
+                    <li><strong>Technical Staff = High Risk:</strong> Employees with IT expertise require enhanced monitoring and access controls</li>
+                    <li><strong>Don't Enable Fraud Through Trust:</strong> Trust should never override verification and monitoring—especially for privileged users</li>
+                    <li><strong>Recruitment Red Flag:</strong> When a skilled employee recruits non-technical colleagues for "side projects," investigate immediately</li>
+                    <li><strong>Crypto Enthusiasm = Risk Factor:</strong> Employees showing unusual interest in cryptocurrency or blockchain should be monitored</li>
+                    <li><strong>Segregation of Duties:</strong> Ensure no single technical person can operate unilaterally on critical systems</li>
+                    <li><strong>Behavioral Monitoring:</strong> Focus on activity patterns, not just access control—anomalies are early warning signs</li>
+                    <li><strong>Culture of Reporting:</strong> Create an environment where employees feel safe reporting colleagues' suspicious behavior</li>
+                </ul>
+            </div>
+        </section>
+        
+        <!-- Quiz Section -->
+        <section id="quiz">
+            <h2>Insider Threat Quiz</h2>
+            <p>For each scenario below, choose whether it is a definite threat to be reported, something to keep a watch upon, or not reportable.</p>
+            <form class="quiz-form" id="insiderQuiz">
+                <div id="quizQuestions"></div>
+                <button type="button" class="quiz-button" onclick="gradeQuiz()">Check My Score</button>
+                <div class="quiz-result" id="quizResult" style="display:none;"></div>
+                <div class="chart-card" id="chartCard" style="display:none;">
+                    <h3>Average Score Trend</h3>
+                    <canvas id="scoreChart" class="chart-canvas" width="720" height="280"></canvas>
+                </div>
+            </form>
+        </section>
+        
+        <!-- Summary Section -->
+        <section>
+            <h2>In Summary</h2>
+            <p>Being a responsible and trustworthy employee means taking security seriously. By following these guidelines and maintaining ethical workplace conduct, you protect not only your organization but also your own reputation and career. Remember that security is everyone's responsibility.</p>
+            
+            <h3>Key Points Summary Video</h3>
+            <p>Watch this 2-minute video to review the essential concepts and best practices for preventing insider threats:</p>
+            
+            <div class="video-container" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); padding: 1.5rem; text-align: center; border-radius: 12px;">
+                <p style="color: white; font-size: 1.2rem; margin-bottom: 1rem; font-weight: 600;">🎥 Watch the 2-Minute Insider Threat Prevention Video</p>
+                <a href="https://share.synthesia.io/22953f00-5735-4652-8a03-d648cb936a05" target="_blank" rel="noopener noreferrer" style="display:inline-block; padding: 1rem 1.5rem; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.35); border-radius: 999px; text-decoration: none; font-weight: 700; transition: transform 0.2s ease, background 0.2s ease;">
+                    Open Video in New Tab
+                </a>
+            </div>
+            
+
+        </section>
+    </container>
+    
+    <footer>
+        <p>&copy; 2026 Business Security. All rights reserved.</p>
+        <p>This guide is for educational purposes to promote workplace security awareness.</p>
+    </footer>
+
+    <div class="ai-chat-widget">
+        <div class="ai-chat-panel" id="aiChatPanel" aria-hidden="true">
+            <div class="ai-chat-header">
+                <span>AI Helper</span>
+            </div>
+            <div class="ai-chat-body" id="aiChatBody">
+                <div class="ai-message ai-message-bot">Hi! Ask me anything about insider threats, security awareness, reporting, or prevention.</div>
+            </div>
+            <div class="ai-chat-input-area">
+                <input id="aiChatInput" class="ai-chat-input" type="text" placeholder="Type a question..." aria-label="Ask AI a question" onkeypress="if(event.key==='Enter') sendChatInput()" />
+                <button class="ai-chat-send" type="button" onclick="sendChatInput()">Send</button>
+            </div>
+            <div class="ai-chat-hint">Example: "When should I report suspicious activity?"</div>
+        </div>
+        <button class="ai-chat-toggle" id="aiChatToggle" type="button" onclick="toggleChat()">Ask AI</button>
+    </div>
+
+    <script>
+        const quizStats = {
+            totalScore: 0,
+            submissions: 0,
+            avgHistory: []
+        };
+
+        const quizQuestions = [
+            {
+                id: 'q1',
+                text: 'A coworker tries to copy confidential files without authorization.',
+                correct: 'report',
+                explanation: 'This is a definite threat because unauthorized copying of confidential files indicates potential data theft or breach.'
+            },
+            {
+                id: 'q2',
+                text: 'A coworker requests that you share your login credentials so they can finish a task.',
+                correct: 'report',
+                explanation: 'Sharing credentials is a serious violation of security policy and should be reported immediately to prevent unauthorized access.'
+            },
+            {
+                id: 'q3',
+                text: 'You notice a colleague frequently accessing company systems from unsecured public Wi-Fi.',
+                correct: 'watch',
+                explanation: 'While concerning, this may be unintentional. Keep a watch to see if it persists or escalates before reporting.'
+            },
+            {
+                id: 'q4',
+                text: 'A technical employee is recruiting coworkers for an outside side project involving sensitive systems.',
+                correct: 'report',
+                explanation: 'Recruiting for external projects using company resources or knowledge is a clear insider threat and must be reported.'
+            },
+            {
+                id: 'q5',
+                text: 'An employee\'s account or device appears to have been taken over by an attacker.',
+                correct: 'report',
+                explanation: 'This indicates a compromised insider situation that needs immediate reporting to contain the breach.'
+            },
+            {
+                id: 'q6',
+                text: 'A colleague stores sensitive data in approved encrypted storage and locks their workstation when away.',
+                correct: 'ignore',
+                explanation: 'This is proper security behavior and not reportable.'
+            },
+            {
+                id: 'q7',
+                text: 'An employee is oversharing company information on social media.',
+                correct: 'watch',
+                explanation: 'Monitor this behavior as it could lead to information leakage, but it may be unintentional at first.'
+            },
+            {
+                id: 'q8',
+                text: 'A coworker uses weak passwords that are easily guessable.',
+                correct: 'watch',
+                explanation: 'While risky, this might be due to lack of awareness. Watch for patterns and consider gentle reminders before escalation.'
+            },
+            {
+                id: 'q9',
+                text: 'An employee reports suspicious activity they observed to the security team.',
+                correct: 'ignore',
+                explanation: 'Reporting suspicious activity is the correct action and should be encouraged, not reported as a threat.'
+            },
+            {
+                id: 'q10',
+                text: 'A user is accessing sensitive data outside their job responsibilities.',
+                correct: 'report',
+                explanation: 'This violates the principle of least privilege and is a potential insider threat that must be reported.'
+            }
+        ];
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quizQuestions');
+            const shuffled = shuffleArray([...quizQuestions]);
+            shuffled.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'quiz-question';
+                questionDiv.innerHTML = `
+                    <p>${index + 1}. ${q.text}</p>
+                    <ul class="quiz-options">
+                        <li><label><input type="radio" name="${q.id}" value="report"> Definite threat — report it immediately</label></li>
+                        <li><label><input type="radio" name="${q.id}" value="watch"> Keep a watch upon the behavior</label></li>
+                        <li><label><input type="radio" name="${q.id}" value="ignore"> Not reportable</label></li>
+                    </ul>
+                    <div class="feedback" id="feedback-${q.id}" style="display:none; margin-top:1rem; padding:1rem; background:#fef3c7; border-radius:8px; color:#92400e;"></div>
+                `;
+                container.appendChild(questionDiv);
+            });
+        }
+
+        function gradeQuiz() {
+            let score = 0;
+            let answered = 0;
+            const form = document.getElementById('insiderQuiz');
+            const resultContainer = document.getElementById('quizResult');
+
+            // Hide previous feedback
+            document.querySelectorAll('.feedback').forEach(f => f.style.display = 'none');
+
+            quizQuestions.forEach(q => {
+                const selected = form.elements[q.id].value || '';
+                const feedbackDiv = document.getElementById(`feedback-${q.id}`);
+                if (selected) answered += 1;
+                if (selected === q.correct) {
+                    score += 1;
+                } else if (selected) {
+                    feedbackDiv.innerHTML = `<strong>Correct answer: ${q.correct === 'report' ? 'Definite threat — report it immediately' : q.correct === 'watch' ? 'Keep a watch upon the behavior' : 'Not reportable'}</strong><br>${q.explanation}`;
+                    feedbackDiv.style.display = 'block';
+                }
+            });
+
+            if (answered < quizQuestions.length) {
+                resultContainer.style.display = 'block';
+                resultContainer.innerHTML = 'Please answer all questions before checking your score.';
+                resultContainer.style.background = 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)';
+                resultContainer.style.borderColor = '#f59e0b';
+                resultContainer.style.color = '#92400e';
+                return;
+            }
+
+            quizStats.totalScore += score;
+            quizStats.submissions += 1;
+            const averagePercent = Math.round((quizStats.totalScore / (quizStats.submissions * quizQuestions.length)) * 100);
+            quizStats.avgHistory.push(averagePercent);
+
+            const percentage = Math.round((score / quizQuestions.length) * 100);
+            let feedback = '';
+
+            if (percentage === 100) {
+                feedback = 'Excellent! You clearly understand key insider threat risks and prevention steps.';
+            } else if (percentage >= 80) {
+                feedback = 'Great job! You have a strong understanding, but review the content once more to reinforce it.';
+            } else if (percentage >= 60) {
+                feedback = 'Good effort. Revisit the sections on risky behaviors and secure practices.';
+            } else {
+                feedback = 'You should review the insider threat material again to strengthen your security awareness.';
+            }
+
+            resultContainer.style.display = 'block';
+            resultContainer.style.background = 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)';
+            resultContainer.style.borderColor = '#10b981';
+            resultContainer.style.color = '#065f46';
+            resultContainer.innerHTML = `You scored ${score} out of ${quizQuestions.length} (${percentage}%). <span>${feedback}</span>`;
+
+            updateQuizStats();
+            drawScoreChart();
+        }
+
+        function updateQuizStats() {
+            const chartCard = document.getElementById('chartCard');
+            chartCard.style.display = 'block';
+        }
+
+        function drawScoreChart() {
+            const canvas = document.getElementById('scoreChart');
+            if (!canvas || !canvas.getContext) return;
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            const padding = 40;
+            const points = quizStats.avgHistory;
+
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.strokeStyle = '#c7d2fe';
+            ctx.lineWidth = 1;
+            for (let y = 0; y <= 5; y += 1) {
+                const yPos = padding + ((height - padding * 2) / 5) * y;
+                ctx.beginPath();
+                ctx.moveTo(padding, yPos);
+                ctx.lineTo(width - padding, yPos);
+                ctx.stroke();
+            }
+
+            if (!points.length) return;
+
+            const maxValue = 100;
+            const stepX = (width - padding * 2) / Math.max(points.length - 1, 1);
+
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            points.forEach((score, index) => {
+                const x = padding + stepX * index;
+                const y = height - padding - ((height - padding * 2) * score) / maxValue;
+                if (index === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            ctx.fillStyle = '#1e40af';
+            points.forEach((score, index) => {
+                const x = padding + stepX * index;
+                const y = height - padding - ((height - padding * 2) * score) / maxValue;
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            ctx.fillStyle = '#475569';
+            ctx.font = '13px Inter, system-ui, sans-serif';
+            ctx.textAlign = 'center';
+            points.forEach((score, index) => {
+                const x = padding + stepX * index;
+                const y = height - padding - ((height - padding * 2) * score) / maxValue - 12;
+                ctx.fillText(`${score}%`, x, y);
+            });
+
+            ctx.fillStyle = '#0f172a';
+            ctx.textAlign = 'left';
+            ctx.fillText('Submissions', padding, height - 12);
+            ctx.textAlign = 'right';
+            ctx.fillText('Average Score', width - padding, padding - 10);
+        }
+
+        function toggleChat(forceOpen) {
+            const panel = document.getElementById('aiChatPanel');
+            const toggle = document.getElementById('aiChatToggle');
+            const isOpen = panel.classList.contains('open');
+            const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !isOpen;
+            if (shouldOpen) {
+                panel.classList.add('open');
+                panel.setAttribute('aria-hidden', 'false');
+                toggle.textContent = 'Close AI';
+                document.getElementById('aiChatInput').focus();
+            } else {
+                panel.classList.remove('open');
+                panel.setAttribute('aria-hidden', 'true');
+                toggle.textContent = 'Ask AI';
+            }
+        }
+
+        function appendChatMessage(text, type) {
+            const body = document.getElementById('aiChatBody');
+            const message = document.createElement('div');
+            message.className = `ai-message ${type === 'user' ? 'ai-message-user' : 'ai-message-bot'}`;
+            message.textContent = text;
+            body.appendChild(message);
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function sendChatInput() {
+            const input = document.getElementById('aiChatInput');
+            const question = input.value.trim();
+            if (!question) return;
+            appendChatMessage(question, 'user');
+            input.value = '';
+            const answer = getChatResponse(question);
+            setTimeout(() => appendChatMessage(answer, 'bot'), 300);
+        }
+
+        function getChatResponse(message) {
+            const text = message.toLowerCase();
+            const politeThanks = text.includes('thanks') || text.includes('thank you') || text.includes('thankyou') || text.includes('thx');
+            const politeBye = text.includes('goodbye') || text.includes('bye') || text.includes('see you');
+            const summaryRequest = text.includes('summary') || text.includes('summarize') || text.includes('summarise');
+            const topicKeywords = [
+                // Core insider threat terms
+                'insider threat', 'insider', 'internal threat', 'trusted insider', 'threat actor', 'malicious insider', 'negligent employee', 'disgruntled', 'compromised account',
+                
+                // Reporting and incident response
+                'report', 'reporting', 'reported', 'incident', 'incident response', 'escalate', 'alert', 'notification', 'flag', 'suspicious activity', 'red flag',
+                
+                // Authentication and access control
+                'password', 'credentials', 'credential', 'authentication', 'multi-factor', 'mfa', 'two-factor', '2fa', 'login', 'access control', 'privilege', 'least privilege', 'privilege escalation', 'unauthorized access', 'unauthorized login',
+                
+                // Attack vectors and threats
+                'phishing', 'spear phishing', 'email', 'malware', 'ransomware', 'social engineering', 'pretexting', 'baiting', 'vishing', 'whaling', 'data exfiltration', 'data theft', 'data stealing',
+                
+                // Security practices
+                'prevention', 'protect', 'protection', 'secure', 'security', 'safeguard', 'defense', 'defense in depth', 'encryption', 'encrypted', 'firewall', 'vpn', 'endpoint protection',
+                
+                // Monitoring and detection
+                'monitoring', 'monitor', 'surveillance', 'audit', 'auditing', 'logging', 'log', 'anomaly detection', 'behavior analysis', 'user behavior', 'activity monitoring', 'track', 'tracking', 'detection', 'identify', 'identify threat',
+                
+                // Data and access
+                'data', 'data protection', 'data security', 'data breach', 'data loss', 'information', 'confidential', 'sensitive data', 'classified', 'access', 'file access', 'system access', 'unauthorized access', 'excessive access', 'data classification',
+                
+                // Behavioral and situational
+                'behavior', 'behavioral', 'watch', 'suspicious', 'unusual activity', 'abnormal behavior', 'red flags', 'warning signs', 'distress', 'financial distress', 'dissatisfied', 'discontentment', 'motivation', 'motive',
+                
+                // Policy and compliance
+                'policy', 'policies', 'compliance', 'compliance policy', 'regulation', 'regulatory', 'gdpr', 'hipaa', 'sox', 'pci', 'iso', 'standard', 'procedure', 'guideline', 'acceptable use', 'usage policy',
+                
+                // Security culture and awareness
+                'awareness', 'awareness training', 'training', 'education', 'education program', 'security culture', 'culture', 'security conscious', 'best practice', 'best practices', 'security hygiene',
+                
+                // Threats and risks
+                'threat', 'risk', 'vulnerability', 'breach', 'breached', 'leak', 'leaked', 'compromise', 'compromised', 'exploit', 'exploitation', 'sabotage', 'damage', 'loss', 'incident',
+                
+                // Employee and personnel
+                'employee', 'employees', 'staff', 'staff member', 'contractor', 'third party', 'partner', 'vendor', 'user', 'personnel', 'disgruntled employee', 'former employee', 'departing employee',
+                
+                // Technical and IT
+                'system', 'systems', 'network', 'database', 'server', 'workstation', 'device', 'computer', 'it', 'ict', 'technology', 'technical', 'software', 'application', 'cloud', 'api',
+                
+                // Cybersecurity specific
+                'cybersecurity', 'cyber security', 'cyber attack', 'cyberattack', 'hacking', 'hack', 'attacker', 'threat actor', 'advanced persistent threat', 'apt', 'zero day',
+                
+                // Detection and investigation
+                'suspicious', 'unusual', 'anomaly', 'anomalies', 'unusual access', 'unusual download', 'unusual traffic', 'unauthorized copy', 'unauthorized transfer', 'unauthorized deletion', 'unauthorized modification',
+                
+                // Specific behaviors and actions
+                'copy files', 'copy data', 'download', 'uploading', 'transfer', 'exfiltrate', 'send email', 'remove data', 'delete', 'modify', 'change permission', 'bypass', 'circumvent', 'disable',
+                
+                // Security roles and functions
+                'security team', 'security officer', 'ciso', 'it security', 'security admin', 'security team', 'incident response team', 'forensics', 'incident handler',
+                
+                // General security keywords
+                'secure', 'security', 'protection', 'defend', 'guard', 'shield', 'protect', 'safeguard', 'vulnerability', 'risk management', 'threat management', 'security measure', 'security control',
+                
+                // Remote work and access
+                'remote access', 'remote work', 'remote', 'vpn', 'work from home', 'wfh', 'telework', 'public wifi', 'unsecured network', 'unsecured', 'untrusted network',
+                
+                // Page/content references
+                'website', 'page', 'webpage', 'web page', 'content', 'case study', 'case studies', 'scenario', 'scenario-based', 'quiz', 'question', 'assessment',
+                
+                // Support and resources
+                'contacts', 'contact', 'support', 'help', 'resource', 'resources', 'guidance', 'guide', 'help line', 'hotline', 'security team contact', 'reporting channel',
+                
+                // Additional security terms
+                'identity', 'identity theft', 'impersonation', 'unauthorized activity', 'abuse', 'misuse', 'suspicious download', 'suspicious email', 'suspicious link', 'malicious link', 'suspicious attachment', 'business email compromise', 'bec',
+                
+                // Access patterns and hours
+                'unusual hours', 'after hours', 'weekend access', 'holiday access', 'off-hours', 'night shift', 'access time', 'access pattern',
+                
+                // Recovery and response
+                'recover', 'recovery', 'backup', 'restore', 'incident handling', 'containment', 'eradication', 'remediation', 'mitigation', 'damage control',
+                
+                // Business impact
+                'business impact', 'financial loss', 'reputation', 'reputational harm', 'operational impact', 'confidentiality', 'integrity', 'availability', 'cia triad'
+            ];
+            const isSecurityTopic = topicKeywords.some(keyword => text.includes(keyword));
+
+            if (politeThanks) {
+                return 'You\'re welcome! I hope this answered your question. If you have any other questions about insider threats, reporting, or security awareness, I\'m happy to help.';
+            }
+            if (politeBye) {
+                return 'Have a great day! I hope this answered your question. Let me know if you need any more help with insider threat awareness or security topics.';
+            }
+
+            // Handle greetings - use word boundaries to avoid false matches
+            const greeting = /\b(hello|hi|hey|greetings|howdy)\b/.test(text);
+            if (greeting) {
+                return 'Hello! Welcome to the Insider Threat Awareness Guide. I\'m here to help you learn about security, recognizing threats, and best practices. What would you like to know about insider threats or security awareness?';
+            }
+
+            // Handle yes/no responses
+            const affirmative = text.includes('yes') || text.includes('yeah') || text.includes('yep') || text.includes('yup') || text.includes('sure') || text.includes('okay') || text.includes('ok');
+            if (affirmative && !text.includes('no')) {
+                return 'Great! I\'m glad you\'re interested in learning more about security. Do you have any specific questions about insider threats, prevention strategies, reporting procedures, or security best practices? I\'m here to help.';
+            }
+
+            const negative = text.includes('no') || text.includes('nope') || text.includes('nah') || text.includes('not really');
+            if (negative && !text.includes('yes')) {
+                return 'No problem! Feel free to ask me any questions about insider threats, security awareness, or prevention strategies whenever you\'re ready. I\'m here to help keep your organization secure.';
+            }
+
+            // Handle summary requests before general topic filtering so section summaries are allowed
+            if (summaryRequest) {
+                if (text.includes('quiz')) {
+                    return 'Summary of the Quiz section: The interactive quiz assesses your understanding of insider threats with 10 randomized scenarios. For each situation, choose whether to "Report" (immediate security concern), "Watch" (monitor closely), or "Ignore" (no action needed). Your performance is scored, and average quiz results are visualized in a statistical chart to track awareness levels.';
+                }
+                if (text.includes('prevention') || text.includes('strategies') || text.includes('mitigation')) {
+                    return 'Summary of Prevention Strategies: To mitigate insider threats, implement least privilege access controls, provide regular security awareness training, monitor user activities, enforce comprehensive policies, conduct background checks, and cultivate a security-conscious culture. Regular audits, incident response planning, and technological safeguards are also crucial.';
+                }
+                if (text.includes('best practice') || text.includes('best practices') || text.includes('guidelines') || text.includes('tips')) {
+                    return 'Summary of Best Practices: Follow secure behavior guidelines such as using strong passwords, protecting credentials, avoiding suspicious emails, securing devices, and reporting unusual activity. Treat security as part of everyday work and keep your actions aligned with company policies and training.';
+                }
+                if (text.includes('resources') || text.includes('resource') || text.includes('additional resources')) {
+                    return 'Summary of Additional Resources: This section points to helpful guidance and contact points for insider threat awareness, including security team contacts, training recommendations, and key reminders for safe behavior. It reinforces the importance of staying informed and using the right reporting channels.';
+                }
+                if (text.includes('important contact') || text.includes('important contacts') || text.includes('contacts') || text.includes('help line') || text.includes('support')) {
+                    return 'Summary of Important Contacts: If you see suspicious activity, contact your security team or IT department right away. Keep emergency security contacts handy, use official reporting channels, and report issues promptly to reduce the risk of insider threat incidents.';
+                }
+                if (text.includes('recommended training') || text.includes('training')) {
+                    return 'Summary of Recommended Training: The site advises ongoing security awareness training to help staff recognize insider threats, handle data safely, report concerns, and follow security policies. Training should be relevant, regular, and reinforced with real-world examples.';
+                }
+                if (text.includes('key takeaways') || text.includes('takeaways') || text.includes('summary video') || text.includes('video')) {
+                    return 'Summary of Key Takeaways: The site emphasizes that insider threats come from trusted users and can be prevented through awareness, strong credentials, careful data handling, and prompt reporting. The summary video reinforces these messages and reminds employees to follow security best practices.';
+                }
+                if (text.includes('types of threats') || text.includes('types') || text.includes('malicious insiders') || text.includes('negligent employees') || text.includes('compromised insiders') || text.includes('disgruntled employees')) {
+                    return 'Summary of Types of Insider Threats: Insider threats include malicious insiders who intentionally harm systems, negligent employees who make careless mistakes, compromised insiders whose accounts are stolen, and disgruntled employees who may misuse access. Each type requires awareness, monitoring, and strong security controls.';
+                }
+                if (text.includes('why should you care') || text.includes('why care') || text.includes('why is') || text.includes('importance')) {
+                    return 'Summary of Why It Matters: Insider threats matter because they come from trusted users with access to sensitive systems and data. They can cause major data loss, financial damage, and reputational harm, so it is important to recognize warning signs and report concerns quickly.';
+                }
+                if (text.includes('case study') || text.includes('case studies') || text.includes('scenario')) {
+                    return 'Summary of the Case Study: The case study describes a technical insider threat where an individual misused authorized access to steal or damage sensitive data. It highlights warning signs like unusual access, data copying, and policy violations, and shows why monitoring and reporting are essential to prevent such incidents.';
+                }
+                if (text.includes('reporting') || text.includes('procedures') || text.includes('report')) {
+                    return 'Summary of Reporting Procedures: Establish clear channels for reporting suspicious activities. Encourage immediate reporting of unusual behaviors, unauthorized access, or policy violations to security teams. Provide anonymous reporting options, ensure quick response times, and protect whistleblowers to maintain trust and effectiveness.';
+                }
+                if (text.includes('recognizing') || text.includes('recognize') || text.includes('warning') || text.includes('signs') || text.includes('threats')) {
+                    return 'Summary of Recognizing Threats: Look for red flags such as employees accessing data beyond their roles, working unusual hours, showing signs of distress, or attempting to bypass security controls. Monitor for unauthorized data transfers, unusual network activity, and policy violations. Early recognition enables timely intervention.';
+                }
+                if (text.includes('understanding') || text.includes('insider threat') || text.includes('insider') || text.includes('introduction') || text.includes('intro') || text.includes('definition')) {
+                    return 'Summary of Understanding Insider Threats: Insider threats originate from individuals with legitimate access who may intentionally or accidentally compromise security. They can be malicious (theft, sabotage) or negligent (poor practices). These threats are particularly dangerous due to trusted access and can cause significant damage to organizations.';
+                }
+                if (text.includes('website') || text.includes('webpage') || text.includes('page') || text.includes('site') || text.includes('whole') || text.includes('full')) {
+                    return 'Full summary of the webpage: This site educates about insider threats - security risks from within organizations. It covers understanding threats, recognizing warning signs, prevention strategies, reporting procedures, and includes an interactive quiz to test knowledge. The goal is to raise awareness and promote proactive security measures to protect business assets and data.';
+                }
+                return 'I can summarize security-related sections of this site, such as the quiz, reporting procedures, prevention strategies, best practices, recognizing threats, or understanding insider threats. If you want a summary of the whole page, ask for the website or page summary specifically.';
+            }
+
+            if (!isSecurityTopic) {
+                return 'That question is off-topic for this AI helper. Please ask something related to insider threats, employee security, reporting, or prevention.';
+            }
+
+            // More detailed and helpful responses
+            if (text.includes('what is') && (text.includes('insider threat') || text.includes('insider'))) {
+                return 'An insider threat refers to the risk posed by individuals who have authorized access to an organization\'s systems, data, or facilities, and who may intentionally or unintentionally misuse that access. This can include employees, contractors, or partners who steal data, cause damage, or enable external attacks. Common examples include unauthorized data sharing, credential theft, or sabotage.';
+            }
+            if (text.includes('insider threat') || text.includes('insider')) {
+                return 'Insider threats are security risks from within your organization. They can be malicious (intentional harm) or negligent (accidental). Key indicators include unusual access patterns, data exfiltration, or policy violations. Prevention involves access controls, monitoring, and employee training.';
+            }
+            if (text.includes('report') || text.includes('reported') || text.includes('reporting')) {
+                return 'Always report suspicious activities immediately. Contact your security team, IT department, or use the company\'s incident reporting system. Don\'t investigate yourself - let professionals handle it. Early reporting prevents potential damage.';
+            }
+            if (text.includes('password') || text.includes('credentials')) {
+                return 'Passwords and credentials are critical assets. Never share them, even with colleagues. Use unique, complex passwords for each account, enable multi-factor authentication (MFA), and change passwords regularly. If you suspect compromise, report it immediately and change credentials.';
+            }
+            if (text.includes('phishing') || text.includes('email') || text.includes('social engineering')) {
+                return 'Phishing attacks often target employees to gain access. Be wary of unsolicited emails asking for information or containing suspicious links. Verify sender identity, don\'t click unknown links, and report suspicious emails. Social engineering manipulates people into divulging confidential information.';
+            }
+            if (text.includes('prevention') || text.includes('protect') || text.includes('secure')) {
+                return 'To prevent insider threats: implement least privilege access, conduct regular security training, monitor user activity, enforce clear policies, perform background checks, and foster a security-aware culture. Regular audits and incident response planning are also essential.';
+            }
+            if (text.includes('behavior') || text.includes('watch') || text.includes('suspicious')) {
+                return 'Watch for red flags like: employees accessing data outside their role, working unusual hours, showing signs of financial distress, or expressing dissatisfaction. Monitor for unauthorized downloads, unusual network traffic, or attempts to bypass security controls.';
+            }
+            if (text.includes('data') || text.includes('access')) {
+                return 'Data access should follow the principle of least privilege - users get only the minimum access needed for their job. Regularly review and revoke unnecessary permissions. Encrypt sensitive data and monitor access logs for anomalies.';
+            }
+            if (text.includes('training') || text.includes('awareness')) {
+                return 'Security awareness training is crucial for preventing insider threats. Regular training should cover recognizing threats, proper data handling, reporting procedures, and company policies. Make it engaging and relevant to employees\' daily work.';
+            }
+            if (text.includes('policy') || text.includes('compliance')) {
+                return 'Security policies provide guidelines for safe behavior. Key policies include acceptable use, data classification, incident reporting, and remote work security. Ensure all employees understand and follow these policies - compliance reduces insider threat risks.';
+            }
+            if (text.includes('monitoring') || text.includes('audit')) {
+                return 'Continuous monitoring and regular audits help detect insider threats early. Monitor user activity, system logs, and data access patterns. Use automated tools for anomaly detection, but balance with privacy considerations.';
+            }
+            if (text.includes('thanks') || text.includes('thank you') || text.includes('thankyou') || text.includes('thx')) {
+                return 'You\'re welcome! I hope this answered your question. If you have any other questions about insider threats, reporting, or security awareness, I\'m happy to help.';
+            }
+            if (text.includes('thank') && text.includes('you')) {
+                return 'You\'re welcome! I hope this answered your question. If you have any other questions about insider threats, reporting, or security awareness, I\'m happy to help.';
+            }
+            if (text.includes('goodbye') || text.includes('bye') || text.includes('see you')) {
+                return 'Have a great day! I hope this answered your question. Let me know if you need any more help with insider threat awareness or security topics.';
+            }
+
+            // Handle "why" questions
+            const whyQuestion = text.includes('why');
+            if (whyQuestion) {
+                if (text.includes('insider threat') || text.includes('report') || text.includes('important')) {
+                    return 'Insider threats matter because they come from trusted users with authorized access to sensitive systems and data. Unlike external attacks, insider threats are harder to detect and can cause significant financial, reputational, and operational damage. Understanding why threats exist helps us implement better prevention and detection strategies.';
+                }
+                if (text.includes('security') || text.includes('awareness') || text.includes('training')) {
+                    return 'Security awareness and training are essential because they empower employees to recognize threats and respond appropriately. Well-informed staff can spot suspicious activities, practice safe behaviors, and report concerns promptly - significantly reducing the risk of successful insider attacks.';
+                }
+                if (text.includes('report') || text.includes('alert')) {
+                    return 'Reporting is critical because early detection can prevent or minimize damage from insider threats. The sooner suspicious activity is reported to security professionals, the faster they can investigate, contain the threat, and protect organizational assets and data.';
+                }
+                return 'That\'s a great question about security. Understanding the "why" behind security practices helps us stay more vigilant. If you have a specific question about insider threats, prevention strategies, or security awareness, I\'d be happy to explain the reasoning behind best practices.';
+            }
+
+            if (!isSecurityTopic) {
+                return 'That question is off-topic for this AI helper. Please ask something related to insider threats, employee security, reporting, or prevention.';
+            }
+
+            // Fallback for on-topic security questions the AI doesn't have a specific response for
+            return 'I\'m not entirely sure how to best answer that specific question, but it does relate to security awareness. I recommend checking the detailed sections on this page for more information, or you could ask your security team for specific guidance on your organization\'s practices. Is there another security topic I can help clarify?';
+        }
+
+        // Initialize quiz on page load
+        document.addEventListener('DOMContentLoaded', renderQuiz);
+    </script>
+</body>
+</html>
